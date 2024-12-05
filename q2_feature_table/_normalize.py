@@ -11,9 +11,11 @@ import biom
 import numpy as np
 
 
-def rarefy(table: biom.Table, sampling_depth: int,
-           with_replacement: bool = False, seed: Union[int, str] = 1) -> biom.Table:
-
+def rarefy(table: biom.Table,
+           sampling_depth: int,
+           with_replacement: bool = False,
+           seed: Union[int, str] = 1
+           ) -> biom.Table:
     # Generate a random seed if seed = "random"
     if seed == "random":
         rng = np.random.default_rng()
