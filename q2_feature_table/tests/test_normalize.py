@@ -17,15 +17,23 @@ from q2_feature_table import rarefy
 
 class RarefyTests(TestCase):
 
-    def test_rarefy(self):
+    def test_rarefy_random_seed(self):
         t = Table(np.array([[0, 1, 3], [1, 1, 2]]),
                   ['O1', 'O2'],
                   ['S1', 'S2', 'S3'])
-        a = rarefy(t, 2)
+        a = rarefy(t, 2, seed="random")
         self.assertEqual(a.shape, (2, 2))
         self.assertEqual(set(a.ids(axis='sample')), set(['S2', 'S3']))
         self.assertEqual(set(a.ids(axis='observation')), set(['O1', 'O2']))
         npt.assert_array_equal(a.sum(axis='sample'), np.array([2., 2.]))
+
+    def test_rarefy_seed_1(self):
+        t = Table(np.array([[0, 1, 3], [1, 1, 2]]),
+                  ['O1', 'O2'],
+                  ['S1', 'S2', 'S3'])
+        a = rarefy(t, 2, seed=1)
+        self.assertEqual(a.data('S2', axis='sample').tolist(), [1, 1])
+        self.assertEqual(a.data('S3', axis='sample').tolist(), [1, 1])
 
     def test_rarefy_replacement(self):
         t = Table(np.array([[0, 10, 30], [10, 10, 20]]),

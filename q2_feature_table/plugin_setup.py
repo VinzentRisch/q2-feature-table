@@ -36,7 +36,8 @@ plugin.methods.register_function(
     function=q2_feature_table.rarefy,
     inputs={'table': FeatureTable[Frequency]},
     parameters={'sampling_depth': Int % Range(1, None),
-                'with_replacement': Bool},
+                'with_replacement': Bool,
+                'seed': Int % Range(0, 2**32) | Str % Choices(["random"])},
     outputs=[('rarefied_table', FeatureTable[Frequency])],
     input_descriptions={'table': 'The feature table to be rarefied.'},
     parameter_descriptions={
@@ -46,7 +47,11 @@ plugin.methods.register_function(
                            'included in the resulting table.'),
         'with_replacement': ('Rarefy with replacement by sampling from the '
                              'multinomial distribution instead of rarefying '
-                             'without replacement.')
+                             'without replacement.'),
+        'seed': ('Set the seed for the subsampling. Using the same seed with '
+                 'the same table will always lead to the same result. Using '
+                 '"random", sets the seed to a random number. The random '
+                 'seed will not be logged in provenance.')
     },
     output_descriptions={
         'rarefied_table': 'The resulting rarefied feature table.'
