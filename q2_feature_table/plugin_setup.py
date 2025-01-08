@@ -48,9 +48,9 @@ plugin.methods.register_function(
         'with_replacement': ('Rarefy with replacement by sampling from the '
                              'multinomial distribution instead of rarefying '
                              'without replacement.'),
-        'random_seed': ('Set the seed for the subsampling. Using the same seed with '
-                        'the same table will always lead to the same result. Defaults '
-                        'to a random seed')
+        'random_seed': ('Set the seed for the subsampling. Using the same '
+                        'seed with the same table will always lead to the '
+                        'same result. Defaults to a random seed.')
     },
     output_descriptions={
         'rarefied_table': 'The resulting rarefied feature table.'
