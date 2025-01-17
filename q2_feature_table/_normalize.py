@@ -5,7 +5,6 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-import random
 import biom
 
 
@@ -14,15 +13,14 @@ def rarefy(table: biom.Table,
            with_replacement: bool = False,
            random_seed: float = None
            ) -> biom.Table:
-    # Generate a random seed if seed is None
-    random.seed(a=random_seed)
 
     if with_replacement:
         table = table.filter(lambda v, i, m: v.sum() >= sampling_depth,
                              inplace=False, axis='sample')
 
     table = table.subsample(sampling_depth, axis='sample', by_id=False,
-                            with_replacement=with_replacement)
+                            with_replacement=with_replacement,
+                            seed=random_seed)
 
     if table.is_empty():
         raise ValueError('The rarefied table contains no samples or features. '
