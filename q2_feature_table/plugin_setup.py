@@ -37,7 +37,7 @@ plugin.methods.register_function(
     inputs={'table': FeatureTable[Frequency]},
     parameters={'sampling_depth': Int % Range(1, None),
                 'with_replacement': Bool,
-                'random_seed': Int},
+                'random_seed': Int % Range(0, None)},
     outputs=[('rarefied_table', FeatureTable[Frequency])],
     input_descriptions={'table': 'The feature table to be rarefied.'},
     parameter_descriptions={

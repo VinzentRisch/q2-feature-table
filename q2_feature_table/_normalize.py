@@ -11,7 +11,7 @@ import biom
 def rarefy(table: biom.Table,
            sampling_depth: int,
            with_replacement: bool = False,
-           random_seed: float = None
+           random_seed: int = None
            ) -> biom.Table:
 
     if with_replacement:
