@@ -32,9 +32,9 @@ class RarefyTests(TestCase):
             npt.assert_array_equal(b.sum(axis='sample'), np.array([2., 2.]))
             a_eq_b.append(a == b)
         self.assertTrue(False in a_eq_b,
-                        f"After {n_iterations} iterations, all resulting feature "
-                        "tables are identical. It therefore seems that a "
-                        "randomized seed is not being used.")
+                        f"After {n_iterations} iterations, all resulting "
+                        "feature tables are identical. It therefore seems "
+                        "that a randomized seed is not being used.")
 
     def test_rarefy_seed_is_not_randomized(self):
         t = Table(np.array([[0, 1, 3], [1, 1, 2]]),
@@ -47,9 +47,10 @@ class RarefyTests(TestCase):
             b = rarefy(t, 2, random_seed=1)
             a_eq_b.append(a == b)
         self.assertFalse(False in a_eq_b,
-                         f"After {n_iterations} iterations, at least one feature "
-                         "table differed from the others. It therefore seems that a "
-                         "randomized seed is being used.")
+                         f"After {n_iterations} iterations, at least one "
+                         "feature table differed from the others. It "
+                         "therefore seems that a randomized seed is being "
+                         "used.")
 
     def test_rarefy_replacement(self):
         t = Table(np.array([[0, 10, 30], [10, 10, 20]]),
