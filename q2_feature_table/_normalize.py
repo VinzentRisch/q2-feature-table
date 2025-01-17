@@ -15,8 +15,7 @@ def rarefy(table: biom.Table,
            random_seed: float = None
            ) -> biom.Table:
     # Generate a random seed if seed is None
-    if random_seed is not None:
-        random.seed(random_seed)
+    random.seed(a=random_seed)
 
     if with_replacement:
         table = table.filter(lambda v, i, m: v.sum() >= sampling_depth,
