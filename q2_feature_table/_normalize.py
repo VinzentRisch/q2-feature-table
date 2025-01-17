@@ -22,8 +22,7 @@ def rarefy(table: biom.Table,
                              inplace=False, axis='sample')
 
     table = table.subsample(sampling_depth, axis='sample', by_id=False,
-                            with_replacement=with_replacement,
-                            seed=random.randint(0, 2**32 - 1))
+                            with_replacement=with_replacement)
 
     if table.is_empty():
         raise ValueError('The rarefied table contains no samples or features. '
