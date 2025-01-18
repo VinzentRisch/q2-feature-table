@@ -25,6 +25,7 @@ requirements:
   - q2-types {{ qiime2_epoch }}.*
   - rnanorm
   build:
+  - python {{ python }}
   - setuptools
   - versioningit
 test:
