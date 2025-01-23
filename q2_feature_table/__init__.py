@@ -1,12 +1,12 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2023, QIIME 2 development team.
+# Copyright (c) 2016-2025, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from ._normalize import rarefy
+from ._normalize import rarefy, normalize
 from ._subsample_ids import subsample_ids
 from ._transform import (presence_absence, relative_frequency, transpose)
 from ._summarize import (summarize, tabulate_seqs, tabulate_sample_frequencies,
@@ -19,10 +19,11 @@ from ._core_features import core_features
 from ._group import group
 from ._rename import rename_ids
 from ._heatmap import (heatmap, heatmap_choices)
-from ._version import get_versions
 
-__version__ = get_versions()['version']
-del get_versions
+try:
+    from ._version import __version__
+except ModuleNotFoundError:
+    __version__ = '0.0.0+notfound'
 
 __all__ = ['rarefy', 'presence_absence', 'relative_frequency', 'transpose',
            'summarize', 'merge', 'merge_seqs', 'filter_samples',
@@ -31,4 +32,4 @@ __all__ = ['rarefy', 'presence_absence', 'relative_frequency', 'transpose',
            'filter_seqs', 'subsample_ids', 'rename_ids',
            'filter_features_conditionally', 'split',
            'tabulate_feature_frequencies', 'tabulate_sample_frequencies',
-           'summarize_plus']
+           'summarize_plus', 'normalize']

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2023, QIIME 2 development team.
+# Copyright (c) 2016-2025, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -25,7 +25,7 @@ def subsample_ids(table: biom.Table, subsampling_depth: int,
 
     # the inverted axis is always observation due to the above transpose
     invaxis = 'observation'
-    table.filter(lambda v, i, m: v.sum() > 0, axis=invaxis)
+    table = table.remove_empty(axis=invaxis, inplace=False)
 
     if axis == 'feature':
         # reverse the transpose necessary due to biocore/biom-format#759
