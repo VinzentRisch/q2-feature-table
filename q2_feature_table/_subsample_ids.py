@@ -5,10 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-from typing import Union
-
 import biom
-import numpy as np
 
 
 def subsample_ids(table: biom.Table,
