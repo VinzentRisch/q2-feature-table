@@ -6,8 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import pkg_resources
+import importlib
 
+import pandas as pd
 import numpy as np
 from biom import Table
 
@@ -34,8 +35,10 @@ local_taxonomy_path = 'moving-pics-taxonomy-gg-2.qza'
 
 
 def get_data_path(filename):
-    return pkg_resources.resource_filename('q2_feature_table.tests',
-                                           'data/%s' % filename)
+    return (
+        importlib.resources.files(
+            'q2_feature_table') / 'tests' / 'data' / filename
+    )
 
 
 def ft1_factory():
@@ -60,6 +63,21 @@ def ft3_factory():
         Table(np.array([[0, 4, 9], [4, 4, 8]]),
               ['O1', 'O4'],
               ['S7', 'S8', 'S9']))
+
+
+def ft4_factory():
+    return Artifact.import_data(
+        'FeatureTable[Frequency]',
+        Table(np.array([[0, 1], [1, 1], [88, 99]]),
+              ['F1', 'F2', 'F3'],
+              ['S1', 'S2']))
+
+
+def fd4_factory():
+    seqs = pd.Series(['AACGT', 'GGAAT', 'GATAGTT', 'GGGGGGGG'],
+                     index=['F1', 'F2', 'F4', 'F5'])
+    return Artifact.import_data(
+        'FeatureData[Sequence]', seqs)
 
 
 def taxon_collection_factory():
@@ -183,7 +201,7 @@ def feature_table_filter_samples_to_subject1(use):
     filtered_table, = use.action(
         use.UsageAction(plugin_id='feature_table', action_id='filter_samples'),
         use.UsageInputs(table=feature_table, metadata=sample_metadata,
-                        where='[subject]="subject-1"'),
+                        where="[subject]='subject-1'"),
         use.UsageOutputNames(filtered_table='filtered_table')
     )
 
@@ -201,7 +219,7 @@ def feature_table_filter_samples_to_skin(use):
     filtered_table, = use.action(
         use.UsageAction(plugin_id='feature_table', action_id='filter_samples'),
         use.UsageInputs(table=feature_table, metadata=sample_metadata,
-                        where='[body-site] IN ("left palm", "right palm")'),
+                        where="[body-site] IN ('left palm', 'right palm')"),
         use.UsageOutputNames(filtered_table='filtered_table')
     )
 
@@ -219,7 +237,7 @@ def feature_table_filter_samples_to_subject1_gut(use):
     filtered_table, = use.action(
         use.UsageAction(plugin_id='feature_table', action_id='filter_samples'),
         use.UsageInputs(table=feature_table, metadata=sample_metadata,
-                        where=r'[subject]="subject-1" AND [body-site]="gut"'),
+                        where=r"[subject]='subject-1' AND [body-site]='gut'"),
         use.UsageOutputNames(filtered_table='filtered_table')
     )
 
@@ -238,7 +256,7 @@ def feature_table_filter_samples_to_gut_or_abx(use):
         use.UsageAction(plugin_id='feature_table', action_id='filter_samples'),
         use.UsageInputs(
             table=feature_table, metadata=sample_metadata,
-            where=r'[body-site]="gut" OR [reported-antibiotic-usage]="Yes"'),
+            where=r"[body-site]='gut' OR [reported-antibiotic-usage]='Yes'"),
         use.UsageOutputNames(filtered_table='filtered_table')
     )
 
@@ -257,7 +275,7 @@ def feature_table_filter_samples_to_subject1_not_gut(use):
         use.UsageAction(plugin_id='feature_table', action_id='filter_samples'),
         use.UsageInputs(
             table=feature_table, metadata=sample_metadata,
-            where=r'[subject]="subject-1" AND NOT [body-site]="gut"'),
+            where=r"[subject]='subject-1' AND NOT [body-site]='gut'"),
         use.UsageOutputNames(filtered_table='filtered_table')
     )
 
@@ -274,6 +292,29 @@ def feature_table_filter_features_min_samples(use):
                         action_id='filter_features'),
         use.UsageInputs(table=feature_table,
                         min_samples=2),
+        use.UsageOutputNames(filtered_table='filtered_table')
+    )
+
+    filtered_table.assert_output_type('FeatureTable[Frequency]')
+
+
+def feature_table_filter_features_sequences(use):
+    feature_table = use.init_artifact('feature_table', ft4_factory)
+    sequences = use.init_artifact('sequences', fd4_factory)
+    metadata = use.view_as_metadata('metadata', sequences)
+
+    use.comment("Retain only features that are represented in the "
+                "collection of sequences provided as metadata. This is "
+                "useful, for example, for removing sequences that are "
+                "identified as chimeric. To learn about "
+                "using Artifacts as Metadata, as is performed here, see "
+                "https://use.qiime2.org/en/latest/how-to-guides/artifacts-as-metadata.html") # noqa
+
+    filtered_table, = use.action(
+        use.UsageAction(plugin_id='feature_table',
+                        action_id='filter_features'),
+        use.UsageInputs(table=feature_table,
+                        metadata=metadata),
         use.UsageOutputNames(filtered_table='filtered_table')
     )
 
