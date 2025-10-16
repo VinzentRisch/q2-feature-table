@@ -17,7 +17,7 @@ from q2_feature_table import subsample_ids
 
 class SubsampleIDsTests(TestCase):
 
-    def test_subsample_samples(self):
+    def test_subsample_samples_w_random_seed(self):
         t = Table(np.array([[0, 1, 3], [1, 1, 2]]),
                   ['O1', 'O2'],
                   ['S1', 'S2', 'S3'])
@@ -40,10 +40,9 @@ class SubsampleIDsTests(TestCase):
             a_eq_b.append(a == b)
 
         self.assertTrue(False in a_eq_b,
-                        f"After {n_iterations} iterations, at least one "
-                        "feature table differed from the others. It "
-                        "therefore seems that a randomized seed is being "
-                        "used.")
+                        f"After {n_iterations} iterations, all feature tables "
+                        "were identical. It therefore seems that a randomized "
+                        "seed is not being used.")
 
     def test_subsample_samples_drop_empty_feature(self):
         t = Table(np.array([[0, 0, 0], [1, 1, 2]]),
@@ -58,7 +57,7 @@ class SubsampleIDsTests(TestCase):
                                        frozenset(['S2', 'S3'])]))
         self.assertEqual(set(a.ids(axis='observation')), set(['O2']))
 
-    def test_subsample_features(self):
+    def test_subsample_features_w_random_seed(self):
         t = Table(np.array([[0, 1, 3], [1, 1, 2]]).T,
                   ['O1', 'O2', 'O3'],
                   ['S1', 'S2'])
@@ -69,8 +68,8 @@ class SubsampleIDsTests(TestCase):
             b = subsample_ids(t, 2, 'feature')
             self.assertEqual(b.shape, (2, 2))
 
-            sample_ids = frozenset(b.ids(axis='observation'))
-            self.assertIn(sample_ids, set([frozenset(['O1', 'O2']),
+            feature_ids = frozenset(b.ids(axis='observation'))
+            self.assertIn(feature_ids, set([frozenset(['O1', 'O2']),
                                            frozenset(['O1', 'O3']),
                                            frozenset(['O2', 'O3'])]))
             self.assertEqual(set(b.ids(axis='sample')), set(['S1', 'S2']))
@@ -81,58 +80,41 @@ class SubsampleIDsTests(TestCase):
             a_eq_b.append(a == b)
 
         self.assertTrue(False in a_eq_b,
-                        f"After {n_iterations} iterations, at least one "
-                        "feature table differed from the others. It "
-                        "therefore seems that a randomized seed is being "
-                        "used.")
+                        f"After {n_iterations} iterations, all feature tables "
+                        "were identical. It therefore seems that a randomized "
+                        "seed is not being used.")
 
-    def test_subsample_samples_with_seed_1(self):
+    def test_subsample_samples_uses_nonrandom_seed(self):
         t = Table(np.array([[0, 1, 3], [1, 1, 2]]),
                   ['O1', 'O2'],
                   ['S1', 'S2', 'S3'])
-        a = subsample_ids(t, 2, 'sample', 1)
+        a = subsample_ids(t, 2, 'sample', random_seed=1)
         a_eq_b = []
         n_iterations = 100
         for i in range(n_iterations):
-            b = subsample_ids(t, 2, 'sample', 1)
-            self.assertEqual(a.shape, (2, 2))
-
-            sample_ids = frozenset(b.ids(axis='sample'))
-            self.assertEqual(sample_ids, frozenset(['S1', 'S2']))
-            self.assertEqual(set(b.ids(axis='observation')), set(['O1', 'O2']))
-
-            for i in b.ids(axis='sample'):
-                npt.assert_equal(t.data(i, axis='sample'),
-                                 b.data(i, axis='sample'))
+            b = subsample_ids(t, 2, 'sample', random_seed=1)
             a_eq_b.append(a == b)
         self.assertFalse(False in a_eq_b,
-                         f"After {n_iterations} iterations, all resulting "
-                         "feature tables are identical. It therefore seems "
-                         "that a randomized seed is not being used.")
+                         f"After {n_iterations} iterations, at least one "
+                         "feature table differed from the others. It "
+                         "therefore seems that a randomized seed is being "
+                         "used.")
 
-    def test_subsample_features_with_seed_1(self):
+    def test_subsample_features_uses_nonrandom_seed(self):
         t = Table(np.array([[0, 1, 3], [1, 1, 2]]).T,
                   ['O1', 'O2', 'O3'],
                   ['S1', 'S2'])
-        a = subsample_ids(t, 2, 'feature', 1)
+        a = subsample_ids(t, 2, 'feature', random_seed=1)
         a_eq_b = []
         n_iterations = 100
         for i in range(n_iterations):
-            b = subsample_ids(t, 2, 'feature', 1)
-            self.assertEqual(b.shape, (2, 2))
-
-            feature_ids = frozenset(b.ids(axis='observation'))
-            self.assertEqual(feature_ids, frozenset(['O1', 'O2']))
-            self.assertEqual(set(b.ids(axis='sample')), set(['S1', 'S2']))
-
-            for i in b.ids(axis='observation'):
-                npt.assert_equal(t.data(i, axis='observation'),
-                                 b.data(i, axis='observation'))
+            b = subsample_ids(t, 2, 'feature', random_seed=1)
             a_eq_b.append(a == b)
         self.assertFalse(False in a_eq_b,
-                         f"After {n_iterations} iterations, all resulting "
-                         "feature tables are identical. It therefore seems "
-                         "that a randomized seed is not being used.")
+                         f"After {n_iterations} iterations, at least one "
+                         "feature table differed from the others. It "
+                         "therefore seems that a randomized seed is being "
+                         "used.")
 
     def test_subsample_features_drop_empty_samples(self):
         t = Table(np.array([[0, 0, 0], [1, 1, 2]]).T,
