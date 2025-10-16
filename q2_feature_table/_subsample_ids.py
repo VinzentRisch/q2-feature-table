@@ -5,12 +5,14 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
 import biom
 
 
-def subsample_ids(table: biom.Table, subsampling_depth: int,
-                  axis: str) -> biom.Table:
+def subsample_ids(table: biom.Table,
+                  subsampling_depth: int,
+                  axis: str,
+                  random_seed: int = None
+                  ) -> biom.Table:
     if axis == 'feature':
         # we are transposing the table due to biocore/biom-format#759
         table = table.transpose()
@@ -21,7 +23,8 @@ def subsample_ids(table: biom.Table, subsampling_depth: int,
                          'is: %d.' % len(table.ids()))
 
     # the axis is always 'sample' due to the above transpose
-    table = table.subsample(subsampling_depth, axis='sample', by_id=True)
+    table = table.subsample(subsampling_depth, axis='sample',
+                            by_id=True, seed=random_seed)
 
     # the inverted axis is always observation due to the above transpose
     invaxis = 'observation'

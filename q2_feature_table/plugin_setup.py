@@ -66,7 +66,9 @@ plugin.methods.register_function(
     function=q2_feature_table.subsample_ids,
     inputs={'table': FeatureTable[Frequency]},
     parameters={'subsampling_depth': Int % Range(1, None),
-                'axis': Str % Choices(['sample', 'feature'])},
+                'axis': Str % Choices(['sample', 'feature']),
+                'random_seed': Int % Range(0, None),
+                },
     outputs=[('sampled_table', FeatureTable[Frequency])],
     input_descriptions={'table': 'The feature table to be sampled.'},
     parameter_descriptions={
@@ -76,7 +78,10 @@ plugin.methods.register_function(
                               'the resulting table.'),
         'axis': ('The axis to sample over. If "sample" then samples will be '
                  'randomly selected to be retained. If "feature" then '
-                 'a random set of features will be selected to be retained.')
+                 'a random set of features will be selected to be retained.'),
+        'random_seed': ('Set the seed for the subsampling. Using the same '
+                        'seed with the same table will always lead to the '
+                        'same result. Defaults to a random seed.')
     },
     output_descriptions={
         'sampled_table': 'The resulting subsampled feature table.'
