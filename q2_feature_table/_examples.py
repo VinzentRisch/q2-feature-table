@@ -308,7 +308,7 @@ def feature_table_filter_features_sequences(use):
                 "useful, for example, for removing sequences that are "
                 "identified as chimeric. To learn about "
                 "using Artifacts as Metadata, as is performed here, see "
-                "https://use.qiime2.org/en/latest/how-to-guides/artifacts-as-metadata.html") # noqa
+                "https://use.qiime2.org/en/stable/how-to-guides/artifacts-as-metadata.html") # noqa
 
     filtered_table, = use.action(
         use.UsageAction(plugin_id='feature_table',
