@@ -9,6 +9,7 @@
 import biom
 import pandas as pd
 import collections
+import warnings
 
 
 def overlap_methods():
@@ -72,7 +73,25 @@ def merge_seqs(data: pd.Series) -> pd.Series:
 
 
 def merge_taxa(data: pd.DataFrame) -> pd.DataFrame:
+    if len(data) > 1:
+        depths = []
+        for taxonomy in data:
+            max = 0
+            for _, row in taxonomy.iterrows():
+                depth = row['Taxon'].count(';')
+                if depth > max:
+                    max = depth
+
+            depths.append(max)
+
+        if len(set(depths)) != 1:
+            warnings.warn(
+                "You are merging taxonomies with different depths.",
+                UserWarning
+            )
+
     data = _merge_feature_data(data)
+
     # merge orders columns alphabetically; Taxon must be first header column
     # as defined here: https://github.com/qiime2/q2-types/blob/
     # 067d83e2aefe98674433e95162336fb5b9d96474/q2_types/feature_data/
