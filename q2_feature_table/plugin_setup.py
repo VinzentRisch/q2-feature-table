@@ -12,8 +12,7 @@ from qiime2.plugin import (Plugin, Int, Float, Range, Metadata, Str, Bool,
                            Visualization)
 
 from q2_types.feature_table import (
-    FeatureTable, Frequency, RelativeFrequency, PresenceAbsence, Composition,
-    Normalized)
+    FeatureTable, Frequency, RelativeFrequency, PresenceAbsence, Composition)
 from q2_types.feature_data import (
     FeatureData, Sequence, Taxonomy, AlignedSequence, SequenceCharacteristics)
 from q2_types.metadata import ImmutableMetadata
@@ -730,38 +729,6 @@ plugin.pipelines.register_function(
     examples={'feature_table_summarize_': ex.feature_table_summarize}
 )
 
-P_method, T_normalized_table = TypeMap(
-    {
-        Str
-        % Choices("tpm"): (
-            FeatureTable[Normalized % Properties("TPM")],
-        ),
-        Str
-        % Choices("fpkm"): (
-            FeatureTable[Normalized % Properties("FPKM")],
-        ),
-        Str
-        % Choices("tmm"): (
-            FeatureTable[Normalized % Properties("TMM")],
-        ),
-        Str
-        % Choices("uq"): (
-            FeatureTable[Normalized % Properties("UQ")],
-        ),
-        Str
-        % Choices("cuf"): (
-            FeatureTable[Normalized % Properties("CUF")],
-        ),
-        Str
-        % Choices("ctf"): (
-            FeatureTable[Normalized % Properties("CTF")],
-        ),
-        Str
-        % Choices("cpm"): (
-            FeatureTable[Normalized % Properties("CPM")],
-        ),
-    }
-)
 
 plugin.methods.register_function(
     function=q2_feature_table.normalize,
@@ -771,7 +738,7 @@ plugin.methods.register_function(
             SequenceCharacteristics % Properties("length")],
     },
     parameters={
-        "method": P_method,
+        "method": Str% Choices("tpm", "fpkm", "tmm", "uq", "cuf", "ctf", "cpm"),
         "m_trim": Float % Range(
             0, 1, inclusive_start=True, inclusive_end=True
         ),
@@ -779,7 +746,7 @@ plugin.methods.register_function(
             0, 1, inclusive_start=True, inclusive_end=True
         ),
     },
-    outputs=[("normalized_table", T_normalized_table)],
+    outputs=[("normalized_table", FeatureTable[Frequency % Properties("normalized")])],
     input_descriptions={
         "table": "Feature table with gene counts.",
         "gene_length": "Gene lengths of all genes in the feature table.",
