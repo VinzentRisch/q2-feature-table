@@ -731,13 +731,8 @@ plugin.pipelines.register_function(
 
 P_method, P_normalized_table = TypeMap(
     {
-        Str % Choices("tpm"):  Properties("normalized", "tpm"),
-        Str % Choices("fpkm"): Properties("normalized", "fpkm"),
-        Str % Choices("tmm"): Properties("normalized", "tmm"),
-        Str % Choices("uq"): Properties("normalized", "uq"),
-        Str % Choices("cuf"): Properties("normalized", "cuf"),
-        Str % Choices("ctf"): Properties("normalized", "ctf"),
-        Str % Choices("cpm"): Properties("normalized", "cpm"),
+        Choices(method): Properties("normalized", method)
+        for method in ("tpm", "fpkm", "tmm", "uq", "cuf", "ctf", "cpm")
     }
 )
 
@@ -749,7 +744,7 @@ plugin.methods.register_function(
             SequenceCharacteristics % Properties("length")],
     },
     parameters={
-        "method": P_method,
+        "method": Str % P_method,
         "m_trim": Float % Range(
             0, 1, inclusive_start=True, inclusive_end=True
         ),
