@@ -752,7 +752,7 @@ plugin.methods.register_function(
             0, 1, inclusive_start=True, inclusive_end=True
         ),
     },
-    outputs=[("normalized_table", FeatureTable[Frequency % P_normalized_table])],
+    outputs={"normalized_table": FeatureTable[Frequency % P_normalized_table]},
     input_descriptions={
         "table": "Feature table with gene counts.",
         "gene_length": "Gene lengths of all genes in the feature table.",
