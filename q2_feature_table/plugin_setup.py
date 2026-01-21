@@ -731,7 +731,7 @@ plugin.pipelines.register_function(
 
 P_method, P_normalized_table = TypeMap(
     {
-        Str% Choices("tpm"):  Properties("normalized", "tpm"),
+        Str % Choices("tpm"):  Properties("normalized", "tpm"),
         Str % Choices("fpkm"): Properties("normalized", "fpkm"),
         Str % Choices("tmm"): Properties("normalized", "tmm"),
         Str % Choices("uq"): Properties("normalized", "uq"),
