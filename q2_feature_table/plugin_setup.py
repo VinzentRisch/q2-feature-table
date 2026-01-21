@@ -733,31 +733,31 @@ P_method, T_normalized_table = TypeMap(
     {
         Str
         % Choices("tpm"): (
-            FeatureTable[Frequency % Properties("tpm")],
+            FeatureTable[Frequency % Properties("normalized", "tpm")],
         ),
         Str
         % Choices("fpkm"): (
-            FeatureTable[Frequency % Properties("fpkm")],
+            FeatureTable[Frequency % Properties("normalized", "fpkm")],
         ),
         Str
         % Choices("tmm"): (
-            FeatureTable[Frequency % Properties("tmm")],
+            FeatureTable[Frequency % Properties("normalized", "tmm")],
         ),
         Str
         % Choices("uq"): (
-            FeatureTable[Frequency % Properties("uq")],
+            FeatureTable[Frequency % Properties("normalized", "uq")],
         ),
         Str
         % Choices("cuf"): (
-            FeatureTable[Frequency % Properties("cuf")],
+            FeatureTable[Frequency % Properties("normalized", "cuf")],
         ),
         Str
         % Choices("ctf"): (
-            FeatureTable[Frequency % Properties("ctf")],
+            FeatureTable[Frequency % Properties("normalized", "ctf")],
         ),
         Str
         % Choices("cpm"): (
-            FeatureTable[Frequency % Properties("cpm")],
+            FeatureTable[Frequency % Properties("normalized", "cpm")],
         ),
     }
 )
