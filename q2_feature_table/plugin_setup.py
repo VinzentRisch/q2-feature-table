@@ -729,6 +729,38 @@ plugin.pipelines.register_function(
     examples={'feature_table_summarize_': ex.feature_table_summarize}
 )
 
+P_method, T_normalized_table = TypeMap(
+    {
+        Str
+        % Choices("tpm"): (
+            FeatureTable[Frequency % Properties("tpm")],
+        ),
+        Str
+        % Choices("fpkm"): (
+            FeatureTable[Frequency % Properties("fpkm")],
+        ),
+        Str
+        % Choices("tmm"): (
+            FeatureTable[Frequency % Properties("tmm")],
+        ),
+        Str
+        % Choices("uq"): (
+            FeatureTable[Frequency % Properties("uq")],
+        ),
+        Str
+        % Choices("cuf"): (
+            FeatureTable[Frequency % Properties("cuf")],
+        ),
+        Str
+        % Choices("ctf"): (
+            FeatureTable[Frequency % Properties("ctf")],
+        ),
+        Str
+        % Choices("cpm"): (
+            FeatureTable[Frequency % Properties("cpm")],
+        ),
+    }
+)
 
 plugin.methods.register_function(
     function=q2_feature_table.normalize,
@@ -738,7 +770,7 @@ plugin.methods.register_function(
             SequenceCharacteristics % Properties("length")],
     },
     parameters={
-        "method": Str% Choices("tpm", "fpkm", "tmm", "uq", "cuf", "ctf", "cpm"),
+        "method": P_method,
         "m_trim": Float % Range(
             0, 1, inclusive_start=True, inclusive_end=True
         ),
@@ -746,7 +778,7 @@ plugin.methods.register_function(
             0, 1, inclusive_start=True, inclusive_end=True
         ),
     },
-    outputs=[("normalized_table", FeatureTable[Frequency % Properties("normalized")])],
+    outputs=[("normalized_table", T_normalized_table)],
     input_descriptions={
         "table": "Feature table with gene counts.",
         "gene_length": "Gene lengths of all genes in the feature table.",
