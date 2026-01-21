@@ -729,36 +729,15 @@ plugin.pipelines.register_function(
     examples={'feature_table_summarize_': ex.feature_table_summarize}
 )
 
-P_method, T_normalized_table = TypeMap(
+P_method, P_normalized_table = TypeMap(
     {
-        Str
-        % Choices("tpm"): (
-            FeatureTable[Frequency % Properties("normalized", "tpm")],
-        ),
-        Str
-        % Choices("fpkm"): (
-            FeatureTable[Frequency % Properties("normalized", "fpkm")],
-        ),
-        Str
-        % Choices("tmm"): (
-            FeatureTable[Frequency % Properties("normalized", "tmm")],
-        ),
-        Str
-        % Choices("uq"): (
-            FeatureTable[Frequency % Properties("normalized", "uq")],
-        ),
-        Str
-        % Choices("cuf"): (
-            FeatureTable[Frequency % Properties("normalized", "cuf")],
-        ),
-        Str
-        % Choices("ctf"): (
-            FeatureTable[Frequency % Properties("normalized", "ctf")],
-        ),
-        Str
-        % Choices("cpm"): (
-            FeatureTable[Frequency % Properties("normalized", "cpm")],
-        ),
+        Str% Choices("tpm"):  Properties("normalized", "tpm"),
+        Str % Choices("fpkm"): Properties("normalized", "fpkm"),
+        Str % Choices("tmm"): Properties("normalized", "tmm"),
+        Str % Choices("uq"): Properties("normalized", "uq"),
+        Str % Choices("cuf"): Properties("normalized", "cuf"),
+        Str % Choices("ctf"): Properties("normalized", "ctf"),
+        Str % Choices("cpm"): Properties("normalized", "cpm"),
     }
 )
 
@@ -778,7 +757,7 @@ plugin.methods.register_function(
             0, 1, inclusive_start=True, inclusive_end=True
         ),
     },
-    outputs=[("normalized_table", T_normalized_table)],
+    outputs=[("normalized_table", FeatureTable[Frequency % P_normalized_table])],
     input_descriptions={
         "table": "Feature table with gene counts.",
         "gene_length": "Gene lengths of all genes in the feature table.",
