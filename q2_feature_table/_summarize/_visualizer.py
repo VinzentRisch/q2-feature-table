@@ -22,6 +22,7 @@ import skbio
 import qiime2
 import json
 from ._vega_spec import vega_spec
+from rachis.metadata import Metadata
 
 _blast_url_template = ("http://www.ncbi.nlm.nih.gov/BLAST/Blast.cgi?"
                        "ALIGNMENT_VIEW=Pairwise&PROGRAM=blastn&DATABASE"
@@ -50,6 +51,22 @@ def tabulate_seqs(output_dir: str, data: DNAIterator,
 
     if metadata is not None:
         metadata_df = metadata.to_dataframe()
+
+        # Make sure numeric columns are represented correctly
+        for column in metadata_df.columns:
+            if metadata.get_column(column).type == 'categorical':
+                numeric_column = pd.to_numeric(
+                    metadata_df[column].str.replace(',', ''), errors='coerce'
+                )
+                if (
+                    not numeric_column.isna().any()
+                    and (numeric_column.astype(str) ==
+                         metadata_df[column].str.replace(',', '')).all()
+                ):
+                    metadata_df[column] = numeric_column
+
+                metadata = Metadata(metadata_df)
+
         if merge_method == 'union':
             display_sequences = display_sequences.union(metadata_df.index)
         elif merge_method == 'intersect':
@@ -86,6 +103,8 @@ def tabulate_seqs(output_dir: str, data: DNAIterator,
         context['taxonomy'] = taxonomy
     if metadata is not None:
         context['metadata'] = metadata_df
+        context['is_numeric'] = is_numeric(metadata)
+
     context['display_sequences'] = display_sequences
     q2templates.render(index, output_dir, context=context)
 
@@ -93,6 +112,13 @@ def tabulate_seqs(output_dir: str, data: DNAIterator,
         TEMPLATES, 'tabulate_seqs_assets', 'js', 'tsorter.min.js')
     os.mkdir(os.path.join(output_dir, 'js'))
     shutil.copy(js, os.path.join(output_dir, 'js', 'tsorter.min.js'))
+
+
+def is_numeric(metadata: qiime2.metadata):
+    def is_numeric_closure(column_name: str):
+        return metadata.get_column(column_name).type == 'numeric'
+
+    return is_numeric_closure
 
 
 def _summarize(output_dir: str, table: biom.Table,
