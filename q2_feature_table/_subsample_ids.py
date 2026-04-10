@@ -7,12 +7,15 @@
 # ----------------------------------------------------------------------------
 import biom
 
+from rachis.plugin import CaptureHolder, get_np_random_seed
+
 
 def subsample_ids(table: biom.Table,
                   subsampling_depth: int,
                   axis: str,
-                  random_seed: int = None
+                  random_seed: CaptureHolder[int] = None
                   ) -> biom.Table:
+    random_int = CaptureHolder.get_or_set(random_seed, get_np_random_seed)
     if axis == 'feature':
         # we are transposing the table due to biocore/biom-format#759
         table = table.transpose()
@@ -24,7 +27,7 @@ def subsample_ids(table: biom.Table,
 
     # the axis is always 'sample' due to the above transpose
     table = table.subsample(subsampling_depth, axis='sample',
-                            by_id=True, seed=random_seed)
+                            by_id=True, seed=random_int)
 
     # the inverted axis is always observation due to the above transpose
     invaxis = 'observation'
