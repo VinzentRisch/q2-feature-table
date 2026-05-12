@@ -14,7 +14,7 @@ import pandas.testing as pdt
 from rachis.plugin.testing import TestPluginBase
 
 from q2_feature_table import core_score
-from q2_feature_table._core import _minmax_scale
+from q2_feature_table._core_score import _minmax_scale
 
 
 class TestCoreScore(TestPluginBase):

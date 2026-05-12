@@ -20,7 +20,7 @@ from ._core_features import core_features
 from ._group import group
 from ._rename import rename_ids
 from ._heatmap import (heatmap, heatmap_choices)
-from ._core import core_score
+from ._core_score import core_score
 
 try:
     from ._version import __version__
