@@ -14,7 +14,8 @@ from qiime2.plugin import (Plugin, Int, Float, Range, Metadata, Str, Bool,
 from q2_types.feature_table import (
     FeatureTable, Frequency, RelativeFrequency, PresenceAbsence, Composition)
 from q2_types.feature_data import (
-    FeatureData, Sequence, Taxonomy, AlignedSequence, SequenceCharacteristics)
+    FeatureData, Sequence, Taxonomy, AlignedSequence, SequenceCharacteristics,
+    Importance)
 from q2_types.metadata import ImmutableMetadata
 
 import q2_feature_table
@@ -775,4 +776,44 @@ plugin.methods.register_function(
     description="Normalize FeatureTable by gene length, library size and "
     "composition with common methods for RNA-seq.",
     citations=[citations["Zmrzlikar_RNAnorm_RNA-seq_data_2023"]],
+)
+
+plugin.methods.register_function(
+    function=q2_feature_table.core_score,
+    inputs={'table': FeatureTable[RelativeFrequency]},
+    parameters={'min_rel_abundance': Float % Range(0, 1,
+                                                  inclusive_start=False),
+                'mean_abundance_on_presence': Bool,
+                'eps': Float % Range(0, None, inclusive_start=False)},
+    outputs=[('core_scores', FeatureData[Importance])],
+    input_descriptions={
+        'table': 'The relative-frequency feature table to score.'
+    },
+    parameter_descriptions={
+        'min_rel_abundance': (
+            'Minimum relative abundance used to count a feature as present '
+            'in a sample.'
+        ),
+        'mean_abundance_on_presence': (
+            'If true, compute mean relative abundance using only samples '
+            'where the feature is greater than `min_rel_abundance`. If '
+            'false, compute mean relative abundance across all samples.'
+        ),
+        'eps': (
+            'Small positive value used as the log offset and min-max '
+            'scaling denominator offset.'
+        )
+    },
+    output_descriptions={
+        'core_scores': 'Core scores for each feature.'
+    },
+    name='Compute core score for features',
+    description=('Compute a prevalence-abundance core score for each feature '
+                 'in a relative-frequency feature table. Prevalence is the '
+                 'fraction of samples where a feature exceeds '
+                 '`min_rel_abundance`; mean relative abundance is computed '
+                 'either across all samples or only samples above '
+                 '`min_rel_abundance`, then log-transformed with `eps`; both '
+                 'quantities are min-max scaled across features and '
+                 'multiplied to produce the final score.')
 )
