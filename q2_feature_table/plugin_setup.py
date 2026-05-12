@@ -781,8 +781,8 @@ plugin.methods.register_function(
 plugin.methods.register_function(
     function=q2_feature_table.core_score,
     inputs={'table': FeatureTable[RelativeFrequency]},
-    parameters={'min_rel_abundance': Float % Range(0, 1,
-                                                  inclusive_start=False),
+    parameters={'min_rel_abundance': 
+                    Float % Range(0, 1, inclusive_start=False),
                 'mean_abundance_on_presence': Bool,
                 'eps': Float % Range(0, None, inclusive_start=False)},
     outputs=[('core_scores', FeatureData[Importance])],
