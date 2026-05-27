@@ -11,6 +11,8 @@ import qiime2
 import numpy as np
 import pandas as pd
 
+from ._transform import relative_frequency
+
 
 def _validate_nonempty_table(table):
     if table.is_empty():
@@ -18,6 +20,11 @@ def _validate_nonempty_table(table):
                          "you filter all samples or features out of the "
                          "table. Please check your filtering parameters and "
                          "try again.")
+
+
+def check_relative_frequency(table: biom.Table) -> bool:
+    sample_sums = table.sum(axis='sample')
+    return (np.isclose(sample_sums, 1) | np.isclose(sample_sums, 0)).all()
 
 
 def _get_biom_filter_function(ids_to_keep, min_frequency, max_frequency,
@@ -101,12 +108,17 @@ def filter_features(table: biom.Table, min_frequency: int = 0,
     if max_frequency == 'inf':
         max_frequency = None
 
+    is_relative_frequency = check_relative_frequency(table)
+
     _filter_table(table=table, min_frequency=min_frequency,
                   max_frequency=max_frequency, min_nonzero=min_samples,
                   max_nonzero=max_samples, metadata=metadata,
                   where=where, axis='observation', exclude_ids=exclude_ids,
                   filter_opposite_axis=filter_empty_samples,
                   allow_empty_table=allow_empty_table)
+
+    if is_relative_frequency and not table.is_empty():
+        relative_frequency(table)
 
     return table
 
