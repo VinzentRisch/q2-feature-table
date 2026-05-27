@@ -253,11 +253,13 @@ class FilterFeaturesTests(unittest.TestCase):
                          set(['S1', 'S2', 'S3', 'S4']))
         self.assertEqual(set(actual.ids(axis='observation')),
                          set(['O1', 'O3']))
-        np.testing.assert_allclose(actual.sum(axis='sample'),
-                            np.array([1., 1., 1., 0.]))
-        np.testing.assert_allclose(actual.matrix_data.toarray(),
-                            np.array([[2/7, 5/9, 3/4, 0.],
-                                      [5/7, 4/9, 1/4, 0.]]))
+        np.testing.assert_allclose(
+            actual.sum(axis='sample'), np.array([1., 1., 1.,0.])
+        )
+        np.testing.assert_allclose(
+            actual.matrix_data.toarray(), np.array([[2/7, 5/9,3/4, 0.],
+                                                    [5/7, 4/9, 1/4, 0.]])
+        )
 
 
 if __name__ == "__main__":
