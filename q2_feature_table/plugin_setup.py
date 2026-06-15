@@ -423,10 +423,10 @@ plugin.methods.register_function(
      Int % Range(0, None)): FeatureTable[Frequency],
     (FeatureTable[Frequency],
      Int % Range(0, None),
-     Str % Choices(['inf'])): FeatureTable[Frequency],
+     Str % Choices(['None'])): FeatureTable[Frequency],
     (FeatureTable[RelativeFrequency],
      Int % Range(0, 0, inclusive_start=True, inclusive_end=True),
-     Str % Choices(['inf'])): FeatureTable[RelativeFrequency],
+     Str % Choices(['None'])): FeatureTable[RelativeFrequency],
 })
 
 plugin.methods.register_function(

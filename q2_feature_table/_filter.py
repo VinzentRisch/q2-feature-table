@@ -98,14 +98,14 @@ def filter_samples(table: biom.Table, min_frequency: int = 0,
 
 
 def filter_features(table: biom.Table, min_frequency: int = 0,
-                    max_frequency: int | str = "inf", min_samples: int = 0,
+                    max_frequency: int | str = 'None', min_samples: int = 0,
                     max_samples: int = None,
                     metadata: qiime2.Metadata = None, where: str = None,
                     exclude_ids: bool = False,
                     filter_empty_samples: bool = True,
                     allow_empty_table: bool = False)\
                    -> biom.Table:
-    if max_frequency == 'inf':
+    if max_frequency == 'None':
         max_frequency = None
 
     is_relative_frequency = check_relative_frequency(table)
