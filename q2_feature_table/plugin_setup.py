@@ -412,12 +412,28 @@ plugin.methods.register_function(
     }
 )
 
+(
+    i_filter_features_table,
+    p_filter_features_min_frequency,
+    p_filter_features_max_frequency,
+    o_filter_features_table,
+) = TypeMap({
+    (FeatureTable[Frequency],
+     Int % Range(0, None),
+     Int % Range(0, None)): FeatureTable[Frequency],
+    (FeatureTable[Frequency],
+     Int % Range(0, None),
+     Str % Choices(['None'])): FeatureTable[Frequency],
+    (FeatureTable[RelativeFrequency],
+     Int % Range(0, 0, inclusive_start=True, inclusive_end=True),
+     Str % Choices(['None'])): FeatureTable[RelativeFrequency],
+})
 
 plugin.methods.register_function(
     function=q2_feature_table.filter_features,
-    inputs={'table': FeatureTable[Frequency]},
-    parameters={'min_frequency': Int,
-                'max_frequency': Int,
+    inputs={'table': i_filter_features_table},
+    parameters={'min_frequency': p_filter_features_min_frequency,
+                'max_frequency': p_filter_features_max_frequency,
                 'min_samples': Int,
                 'max_samples': Int,
                 'metadata': Metadata,
@@ -425,17 +441,20 @@ plugin.methods.register_function(
                 'exclude_ids': Bool,
                 'filter_empty_samples': Bool,
                 'allow_empty_table': Bool},
-    outputs=[('filtered_table', FeatureTable[Frequency])],
+    outputs=[('filtered_table', o_filter_features_table)],
     input_descriptions={
         'table': 'The feature table from which features should be filtered.'
     },
     parameter_descriptions={
         'min_frequency': ('The minimum total frequency that a feature must '
-                          'have to be retained.'),
+                          'have to be retained. This parameter can only be '
+                          'used with FeatureTable[Frequency] inputs.'),
         'max_frequency': ('The maximum total frequency that a feature can '
                           'have to be retained. If no value is provided '
                           'this will default to infinity (i.e., no maximum '
-                          'frequency filter will be applied).'),
+                          'frequency filter will be applied). This parameter '
+                          'can only be used with FeatureTable[Frequency] '
+                          'inputs.'),
         'min_samples': ('The minimum number of samples that a feature must '
                         'be observed in to be retained.'),
         'max_samples': ('The maximum number of samples that a feature can '

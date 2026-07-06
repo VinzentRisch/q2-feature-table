@@ -14,6 +14,7 @@ import pandas as pd
 from biom.table import Table
 
 from q2_feature_table import filter_features
+from q2_feature_table._filter import check_relative_frequency
 
 
 class FilterFeaturesTests(unittest.TestCase):
@@ -216,6 +217,49 @@ class FilterFeaturesTests(unittest.TestCase):
                          ['O2'],
                          ['S1', 'S2', 'S3'])
         self.assertEqual(actual, expected)
+
+    def test_check_relative_frequency_true(self):
+        table = Table(np.array([[0.2, 0.5, 0.3],
+                                [0.8, 0.5, 0.7],
+                                [0.0, 0.0, 0.0]]),
+                      ['O1', 'O2', 'O3'],
+                      ['S1', 'S2', 'S3'])
+
+        self.assertTrue(check_relative_frequency(table))
+
+    def test_check_relative_frequency_false(self):
+        table = Table(np.array([[0.2, 0.5, 0.3],
+                                [0.3, 0.1, 0.6]]),
+                      ['O1', 'O2'],
+                      ['S1', 'S2', 'S3'])
+
+        self.assertFalse(check_relative_frequency(table))
+
+    def test_relative_frequency(self):
+        table = Table(np.array([[0.2, 0.5, 0.3, 0.0],
+                                [0.3, 0.1, 0.6, 0.0],
+                                [0.5, 0.4, 0.1, 0.0]]),
+                      ['O1', 'O2', 'O3'],
+                      ['S1', 'S2', 'S3', 'S4'])
+        metadata = qiime2.Metadata(
+            pd.DataFrame({'keep': ['yes', 'no', 'yes']},
+                         index=pd.Index(['O1', 'O2', 'O3'], name='id')))
+        actual = filter_features(table, metadata=metadata,
+                                 where="keep='yes'",
+                                 filter_empty_samples=False)
+
+        self.assertEqual(actual.shape, (2, 4))
+        self.assertEqual(set(actual.ids(axis='sample')),
+                         set(['S1', 'S2', 'S3', 'S4']))
+        self.assertEqual(set(actual.ids(axis='observation')),
+                         set(['O1', 'O3']))
+        np.testing.assert_allclose(
+            actual.sum(axis='sample'), np.array([1., 1., 1., 0.])
+        )
+        np.testing.assert_allclose(
+            actual.matrix_data.toarray(), np.array([[2/7, 5/9, 3/4, 0.],
+                                                    [5/7, 4/9, 1/4, 0.]])
+        )
 
 
 if __name__ == "__main__":
