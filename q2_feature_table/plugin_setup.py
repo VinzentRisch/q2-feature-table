@@ -12,7 +12,8 @@ from qiime2.plugin import (Plugin, Int, Float, Range, Metadata, Str, Bool,
                            Visualization)
 
 from q2_types.feature_table import (
-    FeatureTable, Frequency, RelativeFrequency, PresenceAbsence, Composition)
+    FeatureTable, Frequency, RelativeFrequency, PresenceAbsence, Composition,
+    Unconstrained)
 from q2_types.feature_data import (
     FeatureData, Sequence, Taxonomy, AlignedSequence, SequenceCharacteristics,
     LinkedSequence
@@ -35,6 +36,8 @@ plugin = Plugin(
 T1 = TypeMatch([Frequency, RelativeFrequency, PresenceAbsence, Composition])
 T2 = TypeMatch([Sequence, AlignedSequence, LinkedSequence])
 T3 = TypeMatch([Sequence, LinkedSequence])
+T4 = TypeMatch([Frequency, RelativeFrequency, PresenceAbsence, Composition,
+                Unconstrained])
 
 plugin.methods.register_function(
     function=q2_feature_table.rarefy,
@@ -136,10 +139,10 @@ plugin.methods.register_function(
 
 plugin.methods.register_function(
     function=q2_feature_table.transpose,
-    inputs={'table': FeatureTable[T1]},
+    inputs={'table': FeatureTable[T4]},
     parameters={},
     outputs=[('transposed_feature_table',
-             FeatureTable[T1])],
+             FeatureTable[T4])],
     input_descriptions={
         'table': 'The feature table to be transposed.'
     },
@@ -283,7 +286,7 @@ plugin.methods.register_function(
 plugin.methods.register_function(
     function=q2_feature_table.rename_ids,
     inputs={
-        'table': FeatureTable[T1],
+        'table': FeatureTable[T4],
     },
     parameters={
         'metadata': MetadataColumn[Categorical],
@@ -291,7 +294,7 @@ plugin.methods.register_function(
         'axis': Str % Choices({'sample', 'feature'})
         },
     outputs=[
-        ('renamed_table', FeatureTable[T1])
+        ('renamed_table', FeatureTable[T4])
         ],
     input_descriptions={
         'table': 'The table to be renamed',
@@ -662,13 +665,13 @@ plugin.visualizers.register_function(
 
 plugin.methods.register_function(
     function=q2_feature_table.split,
-    inputs={'table': FeatureTable[T1]},
+    inputs={'table': FeatureTable[T4]},
     parameters={
         'metadata': MetadataColumn[Categorical],
         'filter_empty_features': Bool
     },
     outputs=[
-        ('tables', Collection[FeatureTable[T1]])
+        ('tables', Collection[FeatureTable[T4]])
     ],
     input_descriptions={
         'table': 'The table to split.'
@@ -960,4 +963,69 @@ plugin.pipelines.register_function(
         "and what result you expect."
     ),
     citations=[],
+)
+
+plugin.methods.register_function(
+    function=q2_feature_table.filter_ids,
+    inputs={"table": FeatureTable[T4]},
+    parameters={"axis": Str % Choices(["sample", "feature"]),
+                "ids": List[Str],
+                "metadata": Metadata,
+                "where": Str,
+                "exclude_ids": Bool,
+                "filter_empty": Bool,
+                "allow_empty_table": Bool},
+    outputs=[("filtered_table", FeatureTable[T4])],
+    input_descriptions={
+        "table": (
+            "The feature table from which IDs should be filtered."
+        )
+    },
+    parameter_descriptions={
+        "axis": (
+            "The axis to filter. Select 'sample' to filter sample IDs or "
+            "'feature' to filter feature IDs."
+        ),
+        "ids": (
+            "IDs to retain or exclude. This parameter is mutually exclusive "
+            "with `metadata` and `where`."
+        ),
+        "metadata": (
+            "Metadata used with `where` to select IDs to retain or exclude. "
+            "If `where` is not provided, all metadata IDs are selected."
+        ),
+        "where": (
+            "SQLite WHERE clause specifying metadata criteria that must be "
+            "met for IDs on the selected axis to be included in the filtered "
+            "feature table. If not provided, all IDs in `metadata` that are "
+            "also in the feature table will be retained."
+        ),
+        "exclude_ids": (
+            "If true, the IDs selected by `ids`, `metadata`, or `where` "
+            "will be excluded from the filtered table instead of retained."
+        ),
+        "filter_empty": (
+            "If true, drop any IDs on the axis opposite `axis` where none "
+            "of the retained IDs are present."
+        ),
+        "allow_empty_table": (
+            "If true, the filtered table may be empty. Default behavior is "
+            "to raise an error if the filtered table is empty."
+        )
+    },
+    output_descriptions={
+        "filtered_table": (
+            "The feature table filtered by selected sample or feature IDs."
+        )
+    },
+    name="Filter IDs from table",
+    description=(
+        "Filter samples or features from a table using an ID list or "
+        "metadata selected with a SQLite WHERE clause."
+    ),
+    examples={
+        "filter_samples_by_metadata_and_where":
+        ex.feature_table_filter_ids_samples_by_metadata_and_where,
+        "filter_features_by_ids": ex.feature_table_filter_ids_features_by_ids,
+    },
 )

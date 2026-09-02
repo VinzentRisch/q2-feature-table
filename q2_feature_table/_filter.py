@@ -178,3 +178,89 @@ def filter_features_conditionally(table: biom.Table,
         _validate_nonempty_table(new_table)
 
     return new_table
+
+
+def filter_ids(
+        table: biom.Table,
+        axis: str,
+        ids: list[str] = None,
+        metadata: qiime2.Metadata = None,
+        where: str = None,
+        exclude_ids: bool = False,
+        filter_empty: bool = False,
+        allow_empty_table: bool = False
+) -> biom.Table:
+    """Filter sample or feature IDs from a table.
+
+    IDs may be supplied directly with ``ids`` or selected from ``metadata``
+    using a SQLite ``where`` clause. Direct IDs must all occur on the
+    requested axis. ``where`` may be used only with ``metadata``; without a
+    WHERE clause, all metadata IDs are selected. ``metadata`` cannot be used
+    with ``ids``. By default, zero-frequency IDs on the opposite axis are
+    retained; set ``filter_empty`` to remove them.
+
+    Parameters
+    ----------
+    table : biom.Table
+        The table to filter.
+    axis : {'sample', 'feature'}
+        The axis whose IDs will be filtered.
+    ids : list of str, optional
+        IDs to retain or exclude directly.
+    metadata : qiime2.Metadata, optional
+        Metadata used to select IDs with ``where``.
+    where : str, optional
+        SQLite WHERE clause used to select IDs from ``metadata``.
+    exclude_ids : bool, optional
+        Exclude selected IDs instead of retaining them.
+    filter_empty : bool, optional
+        Remove zero-frequency IDs on the opposite axis after filtering.
+    allow_empty_table : bool, optional
+        Permit a result with no samples or features.
+
+    Returns
+    -------
+    biom.Table
+        The filtered table.
+
+    Raises
+    ------
+    ValueError
+        If no selector is provided, selector parameters are invalid, direct
+        IDs are absent from the table, or filtering produces an empty table
+        when ``allow_empty_table`` is false.
+    """
+    axis_map = {"sample": "sample", "feature": "observation"}
+    biom_axis = axis_map[axis]
+
+    if metadata is None and where is not None:
+        raise ValueError("Metadata must be provided if 'where' is specified.")
+    if ids is None and metadata is None:
+        raise ValueError("No filtering was requested.")
+    if ids is not None and metadata is not None:
+        raise ValueError("'ids' and 'metadata' are mutually exclusive.")
+
+    if metadata is not None:
+        ids_to_keep = metadata.get_ids(where=where)
+        # BIOM's ID-list filter raises if supplied IDs are absent from the
+        # table, while metadata commonly contains IDs outside this table.
+        ids_to_keep = set(table.ids(axis=biom_axis)) & set(ids_to_keep)
+    else:
+        ids_to_keep = ids
+        missing_ids = set(ids_to_keep) - set(table.ids(axis=biom_axis))
+        if missing_ids:
+            raise ValueError("The following IDs are not in the table: %s" %
+                             ", ".join(sorted(missing_ids)))
+
+    if exclude_ids:
+        ids_to_keep = set(table.ids(axis=biom_axis)) - set(ids_to_keep)
+
+    table.filter(ids_to_keep, axis=biom_axis, inplace=True)
+
+    if filter_empty:
+        table.remove_empty(axis=_other_axis_map[biom_axis], inplace=True)
+
+    if not allow_empty_table:
+        _validate_nonempty_table(table)
+
+    return table
