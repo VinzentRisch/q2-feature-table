@@ -62,7 +62,8 @@ class FilterIDsTests(TestPluginBase):
             {"Group": ["drop", "keep"]},
             index=pd.Index(["O1", "O2"], name="id")))
 
-        actual = filter_ids(self.table.copy(), axis="feature", metadata=metadata,
+        actual = filter_ids(self.table.copy(), axis="feature",
+                            metadata=metadata,
                             where="\"Group\"='keep'")
         expected = Table(np.array([[0, 2, 0]]), ["O2"],
                          ["S1", "S2", "S3"])
@@ -138,6 +139,7 @@ class FilterIDsTests(TestPluginBase):
     def test_no_filtering_requested(self):
         with self.assertRaisesRegex(ValueError, "No filtering was requested"):
             filter_ids(self.table.copy(), axis="sample")
+
 
 if __name__ == "__main__":
     unittest.main()

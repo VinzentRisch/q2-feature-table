@@ -190,7 +190,8 @@ def filter_ids(
         filter_empty: bool = False,
         allow_empty_table: bool = False
 ) -> biom.Table:
-    """Filter sample or feature IDs from a table.
+    """
+    Filter sample or feature IDs from a table.
 
     IDs may be supplied directly with ``ids`` or selected from ``metadata``
     using a SQLite ``where`` clause. Direct IDs must all occur on the
@@ -198,37 +199,6 @@ def filter_ids(
     WHERE clause, all metadata IDs are selected. ``metadata`` cannot be used
     with ``ids``. By default, zero-frequency IDs on the opposite axis are
     retained; set ``filter_empty`` to remove them.
-
-    Parameters
-    ----------
-    table : biom.Table
-        The table to filter.
-    axis : {'sample', 'feature'}
-        The axis whose IDs will be filtered.
-    ids : list of str, optional
-        IDs to retain or exclude directly.
-    metadata : qiime2.Metadata, optional
-        Metadata used to select IDs with ``where``.
-    where : str, optional
-        SQLite WHERE clause used to select IDs from ``metadata``.
-    exclude_ids : bool, optional
-        Exclude selected IDs instead of retaining them.
-    filter_empty : bool, optional
-        Remove zero-frequency IDs on the opposite axis after filtering.
-    allow_empty_table : bool, optional
-        Permit a result with no samples or features.
-
-    Returns
-    -------
-    biom.Table
-        The filtered table.
-
-    Raises
-    ------
-    ValueError
-        If no selector is provided, selector parameters are invalid, direct
-        IDs are absent from the table, or filtering produces an empty table
-        when ``allow_empty_table`` is false.
     """
     axis_map = {"sample": "sample", "feature": "observation"}
     biom_axis = axis_map[axis]

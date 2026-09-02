@@ -30,7 +30,8 @@ except ModuleNotFoundError:
 
 __all__ = ['rarefy', 'presence_absence', 'relative_frequency', 'transpose',
            '_summarize', 'merge', 'merge_seqs', 'filter_samples',
-           'filter_features', 'filter_ids', 'merge_taxa', 'tabulate_seqs', 'overlap_methods',
+           'filter_features', 'filter_ids', 'merge_taxa', 'tabulate_seqs',
+           'overlap_methods',
            'core_features', 'group', 'heatmap', 'heatmap_choices',
            'filter_seqs', 'subsample_ids', 'rename_ids',
            'filter_features_conditionally', 'split',
